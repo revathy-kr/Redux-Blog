@@ -1,18 +1,49 @@
 import React, { Component } from 'react'
-
+import { connect } from 'react-redux';
+import { v4 as uuidv4 } from "uuid";
 class AddPost extends Component {
+  state = {
+    post: {
+      id: "",
+      title: "",
+      content: "",
+    }
+  }
+
+  handleOnChange = (e) => {
+    this.setState({
+      post: {
+        ...this.state.post,
+        id: uuidv4(),
+        [e.target.name]: e.target.value,
+      }
+    });
+  }
+
+  onSubmit = (e) => {
+    e.preventDefault();
+    this.setState({
+      post: {
+        id: "",
+        title: "",
+        content: "",
+      }
+    });
+    this.props.createPost(this.state.post);
+  }
+
   render() {
     return (
-      <div className="container" style={{margin: "4rem auto"}}>
+      <div className="container" style={{ margin: "4rem auto" }}>
         <h5 className="blue-text center-align">Rev Blog</h5>
-        <form>
+        <form onSubmit={this.onSubmit}>
           <div className="input-field">
             <label htmlFor="post_title">Title</label>
-            <input type="text" name="title" />
+            <input onChange={this.handleOnChange} value={this.state.post.title} type="text" name="title" />
           </div>
           <div className="input-field">
             <label htmlFor="post_content">Content</label>
-            <textarea name="content" id="" className="materialize-textarea"></textarea>
+            <textarea onChange={this.handleOnChange} value={this.state.post.content} name="content" id="" className="materialize-textarea"></textarea>
           </div>
           <div className="input-field">
             <button className="btn blue">
@@ -26,4 +57,12 @@ class AddPost extends Component {
   }
 }
 
-export default AddPost
+const mapDispatchToProps = (dispatch) => {
+  return {
+    createPost: (post) => {
+      dispatch({ type: "ADD_POST", post });
+    }
+  }
+}
+
+export default connect(null, mapDispatchToProps)(AddPost)
